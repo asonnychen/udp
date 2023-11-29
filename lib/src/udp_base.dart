@@ -85,15 +85,22 @@ class UDP {
   /// [ep] - the local endpoint.
   ///
   /// returns the [UDP] instance.
-  static Future<UDP> bind(Endpoint ep) async {
+  static Future<UDP> bind(
+    Endpoint ep, {
+    bool reuseAddress = true,
+    bool reusePort = false,
+    int ttl = 1,
+  }) async {
     var udp = UDP._(ep);
 
     if (ep.isMulticast) {
       var anyAddress = InternetAddress.anyIPv4;
-      udp._socket = await RawDatagramSocket.bind(anyAddress, ep.port!.value);
+      udp._socket = await RawDatagramSocket.bind(anyAddress, ep.port!.value,
+          reuseAddress: reuseAddress, reusePort: reusePort, ttl: ttl);
       udp._socket!.joinMulticast(ep.address!);
     } else {
-      udp._socket = await RawDatagramSocket.bind(ep.address!, ep.port!.value);
+      udp._socket = await RawDatagramSocket.bind(ep.address!, ep.port!.value,
+          reuseAddress: reuseAddress, reusePort: reusePort, ttl: ttl);
     }
 
     return udp;
